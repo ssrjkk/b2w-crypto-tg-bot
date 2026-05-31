@@ -19,22 +19,22 @@ A production-ready Telegram-based crypto trading platform with subscription mana
 
 ```
 app/
-├── bot/          # Telegram bot handlers + Mini App
-├── api/          # FastAPI endpoints + middleware + health + WebSocket
-├── auth/         # JWT authentication
-├── core/         # Enums, exceptions, security
-├── services/     # Business logic + Wallet Connect
-├── adapters/     # DEX integrations
-├── trading/      # Trading orchestrator + price feeds
-├── airdrop/      # Airdrop engine
-├── payments/     # Invoice & verification
-├── dashboard/    # Event logging
-├── models/       # SQLAlchemy models
-├── config/       # Configuration
-├── database/     # SQLAlchemy async manager
-├── cache/        # Redis cache manager
-├── tasks/        # Celery background tasks
-└── celery_config/# Celery configuration
+├── bot/               # Telegram bot handlers + Mini App
+├── api/               # FastAPI endpoints + middleware + health + WebSocket
+├── auth/              # JWT authentication
+├── core/              # Enums, exceptions, security
+├── services/          # Business logic + Wallet Connect
+├── adapters/          # DEX integrations
+├── trading/           # Trading orchestrator + price feeds
+├── airdrop/           # Airdrop engine
+├── payments/          # Invoice & verification
+├── dashboard/         # Event logging
+├── models/            # SQLAlchemy models
+├── config/            # Configuration
+├── database/          # SQLAlchemy async manager
+├── cache/             # Redis cache manager
+├── tasks/             # Celery background tasks
+└── celery_config/     # Celery configuration
 ```
 
 ## Quick Start
@@ -222,6 +222,11 @@ mypy app/
 pre-commit install
 ```
 
-## License
+Автор
+ssrjkk — QA Engineer 
 
-MIT License
+Telegram: @ssrjkk
+Email: ray013lefe@gmail.com
+GitHub: https://github.com/ssrjkk
+
+
