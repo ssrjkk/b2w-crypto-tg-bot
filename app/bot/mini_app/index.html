@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Platform</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #5c7cfa;
+            --primary-dark: #4263eb;
+            --success: #51cf66;
+            --danger: #ff6b6b;
+            --warning: #fcc419;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #212529;
+            --text-muted: #868e96;
+            --border: #dee2e6;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge.active {
+            background: rgba(81, 207, 102, 0.15);
+            color: var(--success);
+        }
+        
+        .status-badge.inactive {
+            background: rgba(134, 142, 150, 0.15);
+            color: var(--text-muted);
+        }
+        
+        .status-badge.pending {
+            background: rgba(252, 196, 25, 0.15);
+            color: var(--warning);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        
+        .nav-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--card-bg);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--card-bg);
+        }
+        
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .balance-item:last-child {
+            border-bottom: none;
+        }
+        
+        .balance-token {
+            font-weight: 600;
+        }
+        
+        .balance-amount {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .trade-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .trade-input {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .trade-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .quote-display {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .quote-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .quote-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .quote-label {
+            color: var(--text-muted);
+        }
+        
+        .quote-value {
+            font-weight: 600;
+        }
+        
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-info {
+            flex: 1;
+        }
+        
+        .activity-type {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .activity-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .activity-status.completed {
+            background: rgba(81, 207, 102, 0.15);
+            color: var(--success);
+        }
+        
+        .activity-status.failed {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--danger);
+        }
+        
+        .activity-status.blocked {
+            background: rgba(252, 196, 25, 0.15);
+            color: var(--warning);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        
+        .error {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .wallet-connect {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .wallet-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Crypto Platform</h1>
+        <p id="user-info">Loading...</p>
+    </div>
+    
+    <div id="auth-required" class="hidden">
+        <div class="card">
+            <div class="wallet-connect">
+                <div class="wallet-icon">🔗</div>
+                <h2>Connect Wallet</h2>
+                <p style="color: var(--text-muted); margin: 12px 0;">
+                    Connect your wallet to access trading features
+                </p>
+                <button class="btn btn-primary" onclick="connectWallet()">
+                    Connect Wallet
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="main-app">
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="dashboard">📊 Dashboard</div>
+            <div class="nav-tab" data-tab="trade">📈 Trade</div>
+            <div class="nav-tab" data-tab="wallet">💳 Wallet</div>
+            <div class="nav-tab" data-tab="activity">📋 Activity</div>
+        </div>
+        
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="card">
+                <div class="card-title">Subscription</div>
+                <div id="subscription-status">
+                    <span class="status-badge inactive">Inactive</span>
+                </div>
+                <div id="subscription-details" class="hidden" style="margin-top: 12px;">
+                    <p style="font-size: 14px; color: var(--text-muted);">
+                        Expires: <span id="expiry-date">-</span>
+                    </p>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 16px;" onclick="showSubscribe()">
+                    Subscribe
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Quick Stats</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700;" id="total-trades">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Total Trades</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700;" id="total-airdrops">0</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Airdrops</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-trade" class="tab-content">
+            <div class="card">
+                <div class="card-title">Swap</div>
+                <div class="trade-row">
+                    <div>
+                        <label class="form-label">From</label>
+                        <select class="form-select" id="from-token">
+                            <option value="ETH">ETH</option>
+                            <option value="USDC">USDC</option>
+                            <option value="USDT">USDT</option>
+                            <option value="GMX">GMX</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="trade-input" id="trade-amount" placeholder="0.0">
+                    </div>
+                    <div>
+                        <label class="form-label">To</label>
+                        <select class="form-select" id="to-token">
+                            <option value="USDC">USDC</option>
+                            <option value="USDT">USDT</option>
+                            <option value="ETH">ETH</option>
+                            <option value="GMX">GMX</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="getQuote()" id="quote-btn">
+                    Get Quote
+                </button>
+                <div id="quote-result" class="hidden" style="margin-top: 16px;">
+                    <div class="quote-display">
+                        <div class="quote-row">
+                            <span class="quote-label">Rate</span>
+                            <span class="quote-value" id="quote-rate">-</span>
+                        </div>
+                        <div class="quote-row">
+                            <span class="quote-label">Price Impact</span>
+                            <span class="quote-value" id="quote-impact">-</span>
+                        </div>
+                        <div class="quote-row">
+                            <span class="quote-label">Est. Gas</span>
+                            <span class="quote-value" id="quote-gas">-</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="executeTrade()">
+                        Execute Swap
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-wallet" class="tab-content">
+            <div class="card">
+                <div class="card-title">Balances</div>
+                <div id="balances">
+                    <div class="loading">Loading balances...</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Wallet Address</div>
+                <p style="font-size: 14px; word-break: break-all;" id="wallet-address">Not connected</p>
+            </div>
+        </div>
+        
+        <div id="tab-activity" class="tab-content">
+            <div class="card">
+                <div class="card-title">Recent Activity</div>
+                <div id="activity-list">
+                    <div class="loading">Loading activity...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="subscribe-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 16px;">
+        <div class="card" style="max-width: 400px; width: 100%;">
+            <div class="card-title">Subscribe to Premium</div>
+            <div class="form-group">
+                <label class="form-label">Network</label>
+                <select class="form-select" id="payment-network">
+                    <option value="arbitrum">Arbitrum</option>
+                    <option value="optimism">Optimism</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Token</label>
+                <select class="form-select" id="payment-token">
+                    <option value="ETH">ETH</option>
+                    <option value="USDC">USDC</option>
+                </select>
+            </div>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+                Price: 0.01 ETH/month
+            </p>
+            <button class="btn btn-primary" onclick="createInvoice()">
+                Generate Invoice
+            </button>
+            <button class="btn btn-secondary" style="margin-top: 8px;" onclick="hideSubscribe()">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const TG = window.Telegram.WebApp;
+        TG.expand();
+        
+        let userId = null;
+        let ws = null;
+        let currentQuote = null;
+        
+        const API_BASE = 'http://localhost:8000/api';
+        
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('auth_token');
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` }),
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: { ...headers, ...options.headers },
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+        
+        function init() {
+            const initData = TG.initDataUnsafe;
+            if (initData && initData.user) {
+                userId = initData.user.id;
+                document.getElementById('user-info').textContent = 
+                    `@${initData.user.username || 'user'}`;
+            }
+            
+            setupTabs();
+            connectWebSocket();
+            loadDashboard();
+        }
+        
+        function setupTabs() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                    
+                    if (tab.dataset.tab === 'wallet') loadBalances();
+                    if (tab.dataset.tab === 'activity') loadActivity();
+                });
+            });
+        }
+        
+        function connectWebSocket() {
+            const wsUrl = 'ws://localhost:8000/ws';
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                if (userId) {
+                    ws.send(JSON.stringify({ type: 'auth', user_id: userId }));
+                }
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, reconnecting...');
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+        
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'trade_update':
+                    showNotification('Trade Update', `${data.status}: ${data.message}`);
+                    break;
+                case 'payment_update':
+                    showNotification('Payment', data.message);
+                    if (data.status === 'confirmed') {
+                        loadDashboard();
+                    }
+                    break;
+                case 'alert':
+                    showNotification('Alert', data.message);
+                    break;
+            }
+        }
+        
+        function showNotification(title, message) {
+            TG.showAlert(`${title}\n${message}`);
+        }
+        
+        async function loadDashboard() {
+            try {
+                const sub = await apiCall(`/subscription/status/${userId}`);
+                const stats = await apiCall(`/dashboard/summary/${userId}`);
+                
+                const statusEl = document.getElementById('subscription-status');
+                const detailsEl = document.getElementById('subscription-details');
+                
+                if (sub && sub.status === 'active') {
+                    statusEl.innerHTML = '<span class="status-badge active">Active</span>';
+                    document.getElementById('expiry-date').textContent = sub.expiry_date;
+                    detailsEl.classList.remove('hidden');
+                    document.getElementById('auth-required').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                } else {
+                    statusEl.innerHTML = '<span class="status-badge inactive">Inactive</span>';
+                    document.getElementById('auth-required').classList.remove('hidden');
+                    document.getElementById('main-app').classList.add('hidden');
+                }
+                
+                document.getElementById('total-trades').textContent = stats.total_actions || 0;
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+        
+        async function getQuote() {
+            const fromToken = document.getElementById('from-token').value;
+            const toToken = document.getElementById('to-token').value;
+            const amount = document.getElementById('trade-amount').value;
+            
+            if (!amount || parseFloat(amount) <= 0) {
+                showNotification('Error', 'Please enter a valid amount');
+                return;
+            }
+            
+            try {
+                const quote = await apiCall('/trading/quote', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user_id: userId,
+                        dex: 'uniswap',
+                        network: 'arbitrum',
+                        from_token: fromToken,
+                        to_token: toToken,
+                        amount: amount,
+                        side: 'buy',
+                        order_type: 'market'
+                    })
+                });
+                
+                currentQuote = quote;
+                document.getElementById('quote-rate').textContent = `1 ${fromToken} = ${quote.price} ${toToken}`;
+                document.getElementById('quote-impact').textContent = `${quote.price_impact}%`;
+                document.getElementById('quote-gas').textContent = quote.estimated_gas;
+                document.getElementById('quote-result').classList.remove('hidden');
+            } catch (error) {
+                showNotification('Error', 'Failed to get quote');
+            }
+        }
+        
+        async function executeTrade() {
+            if (!currentQuote) return;
+            
+            try {
+                const result = await apiCall('/trading/execute', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user_id: userId,
+                        dex: 'uniswap',
+                        network: 'arbitrum',
+                        from_token: document.getElementById('from-token').value,
+                        to_token: document.getElementById('to-token').value,
+                        amount: document.getElementById('trade-amount').value,
+                        side: 'buy',
+                        order_type: 'market',
+                        max_slippage: 2.0
+                    })
+                });
+                
+                if (result.success) {
+                    showNotification('Success', `Trade executed! Hash: ${result.transaction_hash?.slice(0, 16)}...`);
+                } else {
+                    showNotification('Error', result.error || 'Trade failed');
+                }
+            } catch (error) {
+                showNotification('Error', 'Failed to execute trade');
+            }
+        }
+        
+        async function loadBalances() {
+            const balancesEl = document.getElementById('balances');
+            balancesEl.innerHTML = '<div class="loading">Loading...</div>';
+            
+            try {
+                const balances = [
+                    { token: 'ETH', balance: '1.5', balance_usd: 3000 },
+                    { token: 'USDC', balance: '5000', balance_usd: 5000 }
+                ];
+                
+                balancesEl.innerHTML = balances.map(b => `
+                    <div class="balance-item">
+                        <div>
+                            <div class="balance-token">${b.token}</div>
+                            <div class="balance-amount">$${b.balance_usd}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="balance-token">${b.balance}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('wallet-address').textContent = 
+                    '0x1234...abcd';
+            } catch (error) {
+                balancesEl.innerHTML = '<div class="error">Failed to load balances</div>';
+            }
+        }
+        
+        async function loadActivity() {
+            const activityEl = document.getElementById('activity-list');
+            activityEl.innerHTML = '<div class="loading">Loading...</div>';
+            
+            try {
+                const events = await apiCall(`/dashboard/events/${userId}?limit=20`);
+                
+                if (!events.events || events.events.length === 0) {
+                    activityEl.innerHTML = '<p style="color: var(--text-muted);">No activity yet</p>';
+                    return;
+                }
+                
+                activityEl.innerHTML = events.events.map(e => `
+                    <div class="activity-item">
+                        <div class="activity-info">
+                            <div class="activity-type">${e.action_type}</div>
+                            <div class="activity-time">${new Date(e.created_at).toLocaleString()}</div>
+                        </div>
+                        <div class="activity-status ${e.status}">${e.status}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                activityEl.innerHTML = '<div class="error">Failed to load activity</div>';
+            }
+        }
+        
+        function showSubscribe() {
+            document.getElementById('subscribe-modal').classList.remove('hidden');
+        }
+        
+        function hideSubscribe() {
+            document.getElementById('subscribe-modal').classList.add('hidden');
+        }
+        
+        async function createInvoice() {
+            const network = document.getElementById('payment-network').value;
+            const token = document.getElementById('payment-token').value;
+            
+            try {
+                const invoice = await apiCall('/payment/invoice', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user_id: userId,
+                        amount: '0.01',
+                        token: token,
+                        network: network
+                    })
+                });
+                
+                showNotification('Invoice Created', 
+                    `Send ${invoice.amount} ${invoice.token} to ${invoice.address.slice(0, 20)}...`);
+                hideSubscribe();
+            } catch (error) {
+                showNotification('Error', 'Failed to create invoice');
+            }
+        }
+        
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    localStorage.setItem('wallet_address', accounts[0]);
+                    showNotification('Wallet Connected', accounts[0].slice(0, 10) + '...');
+                    loadDashboard();
+                } catch (error) {
+                    showNotification('Error', 'Failed to connect wallet');
+                }
+            } else {
+                showNotification('Info', 'Wallet not found. Please install a wallet.');
+            }
+        }
+        
+        TG.ready();
+        init();
+    </script>
+</body>
+</html>

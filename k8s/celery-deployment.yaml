@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-platform-celery-worker
+  namespace: crypto-platform
+  labels:
+    app: crypto-platform
+    component: celery-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crypto-platform
+      component: celery-worker
+  template:
+    metadata:
+      labels:
+        app: crypto-platform
+        component: celery-worker
+    spec:
+      containers:
+      - name: celery-worker
+        image: crypto-platform:latest
+        command: ["celery", "-A", "app.celery_config", "worker", "--loglevel=info", "--concurrency=4"]
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DATABASE__PATH
+          valueFrom:
+            secretKeyRef:
+              name: crypto-platform-secret
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: crypto-platform-config
+              key: redis-url
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: crypto-platform-config
+              key: celery-broker-url
+        - name: CELERY_RESULT_BACKEND
+          valueFrom:
+            configMapKeyRef:
+              name: crypto-platform-config
+              key: celery-result-backend
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-platform-celery-beat
+  namespace: crypto-platform
+  labels:
+    app: crypto-platform
+    component: celery-beat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-platform
+      component: celery-beat
+  template:
+    metadata:
+      labels:
+        app: crypto-platform
+        component: celery-beat
+    spec:
+      containers:
+      - name: celery-beat
+        image: crypto-platform:latest
+        command: ["celery", "-A", "app.celery_config", "beat", "--loglevel=info"]
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DATABASE__PATH
+          valueFrom:
+            secretKeyRef:
+              name: crypto-platform-secret
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: crypto-platform-config
+              key: redis-url
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: crypto-platform-config
+              key: celery-broker-url
+        - name: CELERY_RESULT_BACKEND
+          valueFrom:
+            configMapKeyRef:
+              name: crypto-platform-config
+              key: celery-result-backend
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"

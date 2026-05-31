@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crypto-platform-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE__PATH=${DATABASE__PATH:-postgresql://postgres:postgres@db:5432/platform}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_MINI_APP_URL=${TELEGRAM_MINI_APP_URL}
+      - RPC_URL_ETH=${RPC_URL_ETH}
+      - RPC_URL_ARBITRUM=${RPC_URL_ARBITRUM}
+      - RPC_URL_OPTIMISM=${RPC_URL_OPTIMISM}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - LOG_LEVEL=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - platform-network
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crypto-platform-celery
+    command: celery -A app.celery_config worker --loglevel=info --concurrency=4
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE__PATH=${DATABASE__PATH:-postgresql://postgres:postgres@db:5432/platform}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - platform-network
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crypto-platform-beat
+    command: celery -A app.celery_config beat --loglevel=info
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE__PATH=${DATABASE__PATH:-postgresql://postgres:postgres@db:5432/platform}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - platform-network
+
+  nginx:
+    image: nginx:latest
+    container_name: crypto-platform-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - platform-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: crypto-platform-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=platform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - platform-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: crypto-platform-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - platform-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  platform-network:
+    driver: bridge
