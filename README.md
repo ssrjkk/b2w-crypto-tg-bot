@@ -1,4 +1,13 @@
 # Telegram Crypto Access & Trading Platform
+[![CI](https://github.com/ssrjkk/b2w-crypto-tg-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/b2w-crypto-tg-bot/actions/workflows/ci.yml)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Telegram bot for crypto portfolio tracking and alerts. Monitors prices, sends notifications, and provides market analysis.
+
+## Features
+
+
 
 A production-ready Telegram-based crypto trading platform with subscription management, perpetual DEX trading, airdrop tracking, and comprehensive risk management.
 
@@ -230,3 +239,33 @@ Email: ray013lefe@gmail.com
 GitHub: https://github.com/ssrjkk
 
 
+
+
+## Installation
+
+```bash
+git clone https://github.com/ssrjkk/b2w-crypto-tg-bot.git
+cd b2w-crypto-tg-bot
+pip install -r requirements.txt
+```
+
+## Configuration
+
+Create a `.env` file:
+
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token
+DATABASE_URL=postgresql://user:pass@localhost/db
+```
+
+## Usage
+
+```bash
+python main.py
+```
+
+Or with Docker:
+
+```bash
+docker-compose up -d
+```
