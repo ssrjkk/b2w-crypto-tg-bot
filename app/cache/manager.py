@@ -208,13 +208,13 @@ def cached(ttl: int = 300, key_prefix: str = ""):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             cache = get_cache()
-            cache_key = f"{key_prefix or func.__name__}:{cache_key(*args, **kwargs)}"
-            cached_result = await cache.get(cache_key)
+            key = f"{key_prefix or func.__name__}:{cache_key(*args, **kwargs)}"
+            cached_result = await cache.get(key)
             if cached_result is not None:
                 return cached_result
 
             result = await func(*args, **kwargs)
-            await cache.set(cache_key, result, ttl)
+            await cache.set(key, result, ttl)
             return result
         return wrapper
     return decorator
