@@ -101,7 +101,7 @@ class MockWalletConnect(BaseWalletConnect):
         """Return mock signature."""
         if not self._connected:
             raise RuntimeError("Not connected")
-        return f"0x{signatures.token_hex(65)}"
+        return f"0x{secrets.token_hex(65)}"
 
 
 class WalletConnectService:
