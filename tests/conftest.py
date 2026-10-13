@@ -79,7 +79,8 @@ async def db_engine():
 async def db_session(db_engine):
     """Create test database session."""
     from sqlalchemy.orm import sessionmaker
-    
+    from sqlalchemy.ext.asyncio import AsyncSession
+
     async_session = sessionmaker(
         db_engine,
         class_=AsyncSession,

@@ -31,7 +31,6 @@ _services: Optional[dict] = None
 
 def get_services() -> dict:
     """Get application services."""
-    global _services
     if _services is None:
         raise RuntimeError("Services not initialized. Call init_services first.")
     return _services
