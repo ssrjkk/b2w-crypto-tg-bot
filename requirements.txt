@@ -16,4 +16,4 @@ structlog>=24.1.0
 sentry-sdk>=1.40.0
 uvicorn>=0.54.0
 pyjwt>=2.15.1
-python-socketio>=5.11.0
+python-socketio>=5.17.0
