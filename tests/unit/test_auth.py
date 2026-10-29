@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime, timedelta
 
-from app.auth.jwt import AuthService, TokenData
+from app.auth.jwt import AuthService
 
 
 class TestAuthService:

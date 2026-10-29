@@ -1,11 +1,8 @@
 """Integration tests for subscription flow."""
 
 import pytest
-import pytest_asyncio
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock
 
-from app.services.subscription_service import SubscriptionService
 from app.models.base import SubscriptionModel, SubscriptionStatus
 
 

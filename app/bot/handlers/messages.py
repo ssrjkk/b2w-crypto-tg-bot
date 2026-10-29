@@ -1,7 +1,6 @@
 """Telegram bot message handlers."""
 
 import logging
-from datetime import datetime
 
 from aiogram.types import Message
 
@@ -9,12 +8,9 @@ from app.bot.keyboards import (
     get_airdrop_keyboard,
     get_dashboard_keyboard,
     get_main_keyboard,
-    get_network_keyboard,
     get_subscribe_keyboard,
     get_trade_keyboard,
 )
-from app.core.enums import ActionStatus, ActionType, RiskDecision
-from app.models.dashboard import EventCreate
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +19,7 @@ async def handle_dashboard(message: Message) -> None:
     """Handle dashboard view."""
     try:
         from app.main import get_services
+
         dashboard_service = get_services()["dashboard"]
 
         user_id = message.from_user.id
@@ -51,6 +48,7 @@ async def handle_subscribe(message: Message) -> None:
     """Handle subscription menu."""
     try:
         from app.main import get_services
+
         subscription_service = get_services()["subscription"]
         user_id = message.from_user.id
 
@@ -78,6 +76,7 @@ async def handle_trade_menu(message: Message) -> None:
     """Handle trade menu."""
     try:
         from app.main import get_services
+
         subscription_service = get_services()["subscription"]
         user_id = message.from_user.id
 
@@ -102,6 +101,7 @@ async def handle_airdrops_menu(message: Message) -> None:
     """Handle airdrops menu."""
     try:
         from app.main import get_services
+
         airdrop_engine = get_services()["airdrop"]
         user_id = message.from_user.id
 
@@ -132,11 +132,9 @@ async def handle_payment_confirm(message: Message) -> None:
     """Handle payment confirmation."""
     try:
         from app.main import get_services
-        from app.payments.invoice import PaymentService
 
         payment_service = get_services()["payment"]
         subscription_service = get_services()["subscription"]
-        dashboard_service = get_services()["dashboard"]
         alerting_service = get_services()["alerting"]
 
         user_id = message.from_user.id
@@ -155,7 +153,7 @@ async def handle_payment_confirm(message: Message) -> None:
                 if alerting_service:
                     await alerting_service.notify_subscription_activated(
                         message.chat.id,
-                        sub.expiry_date.strftime('%Y-%m-%d'),
+                        sub.expiry_date.strftime("%Y-%m-%d"),
                     )
             else:
                 await message.answer("Payment confirmed! Activating subscription...")

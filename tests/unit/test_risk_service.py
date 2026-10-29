@@ -1,11 +1,24 @@
 """Unit tests for risk service."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from datetime import datetime
 
-from app.services.risk_service import RiskService, RiskCheckResult
+import pytest
+
 from app.core.enums import Network, RiskDecision
+from app.services.risk_service import RiskService
+
+
+def _db(trades_in_hour: int = 0, last_trade=None) -> MagicMock:
+    """Сервис считает сделки через `db.execute(select(func.count(...))).scalar()`
+    и кулдаун через `.scalar_one_or_none()` — мок повторяет этот порядок."""
+    count_result = MagicMock()
+    count_result.scalar = MagicMock(return_value=trades_in_hour)
+    cooldown_result = MagicMock()
+    cooldown_result.scalar_one_or_none = MagicMock(return_value=last_trade)
+
+    db = MagicMock()
+    db.execute = AsyncMock(side_effect=[count_result, cooldown_result])
+    return db
 
 
 class TestRiskService:
@@ -16,9 +29,9 @@ class TestRiskService:
         return RiskService(mock_db)
 
     @pytest.mark.asyncio
-    async def test_validate_trade_approved(self, risk_service, mock_db):
+    async def test_validate_trade_approved(self):
         """Test trade validation when all checks pass."""
-        mock_db.fetchone = AsyncMock(return_value={"count": 0})
+        risk_service = RiskService(_db(trades_in_hour=0))
 
         result = await risk_service.validate_trade(
             user_id=1,
@@ -74,9 +87,9 @@ class TestRiskService:
         assert "exceeds max position" in result.reason
 
     @pytest.mark.asyncio
-    async def test_validate_trade_max_trades_exceeded(self, risk_service, mock_db):
+    async def test_validate_trade_max_trades_exceeded(self):
         """Test trade validation when max trades per hour exceeded."""
-        mock_db.fetchone = AsyncMock(return_value={"count": 10})
+        risk_service = RiskService(_db(trades_in_hour=10))
 
         result = await risk_service.validate_trade(
             user_id=1,
@@ -105,8 +118,9 @@ class TestRiskService:
         assert result.decision == RiskDecision.KILL_SWITCH
 
     @pytest.mark.asyncio
-    async def test_kill_switch_deactivation(self, risk_service):
+    async def test_kill_switch_deactivation(self):
         """Test kill switch deactivation."""
+        risk_service = RiskService(_db(trades_in_hour=0))
         risk_service.activate_kill_switch()
         risk_service.deactivate_kill_switch()
 

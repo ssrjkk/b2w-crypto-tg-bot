@@ -1,6 +1,5 @@
 """WebSocket manager for real-time updates."""
 
-import asyncio
 import json
 import logging
 from typing import Dict, Set, Optional
@@ -21,8 +20,17 @@ class ConnectionManager:
         self._connections: Dict[int, Set[WebSocket]] = {}
         self._admin_connections: Set[WebSocket] = set()
 
-    async def connect(self, websocket: WebSocket, user_id: Optional[int] = None) -> None:
-        """Accept WebSocket connection."""
+    async def connect(
+        self,
+        websocket: WebSocket,
+        user_id: Optional[int] = None,
+        is_admin: bool = False,
+    ) -> None:
+        """Accept WebSocket connection.
+
+        Роль назначается сервером: в админский канал socket попадает только когда
+        is_admin=True, а не когда user_id не пришёл — иначе анонимный клиент получал
+        доступ к админской рассылке, просто ничего не отправив."""
         await websocket.accept()
 
         if user_id:
@@ -30,11 +38,14 @@ class ConnectionManager:
                 self._connections[user_id] = set()
             self._connections[user_id].add(websocket)
             logger.info(f"User {user_id} connected, total: {len(self._connections[user_id])}")
-        else:
+
+        if is_admin:
             self._admin_connections.add(websocket)
             logger.info(f"Admin connected, total admins: {len(self._admin_connections)}")
 
-    def disconnect(self, websocket: WebSocket, user_id: Optional[int] = None) -> None:
+    def disconnect(
+        self, websocket: WebSocket, user_id: Optional[int] = None, is_admin: bool = False
+    ) -> None:
         """Remove WebSocket connection."""
         if user_id and user_id in self._connections:
             self._connections[user_id].discard(websocket)
@@ -42,8 +53,9 @@ class ConnectionManager:
                 del self._connections[user_id]
             logger.info(f"User {user_id} disconnected")
 
-        self._admin_connections.discard(websocket)
-        logger.info("Admin disconnected")
+        if is_admin:
+            self._admin_connections.discard(websocket)
+            logger.info("Admin disconnected")
 
     async def send_personal(self, message: dict, user_id: int) -> None:
         """Send message to specific user."""
@@ -124,60 +136,64 @@ manager = ConnectionManager()
 ws_router = APIRouter()
 
 
+class _Session:
+    """Что известно о connected socket: кого пустили и в какую роль."""
+
+    def __init__(self) -> None:
+        self.user_id: Optional[int] = None
+        self.is_admin = False
+
+
+async def _send(websocket: WebSocket, payload: dict) -> None:
+    await websocket.send_text(json.dumps(payload))
+
+
+async def _authenticate(websocket: WebSocket, session: _Session, message: dict) -> None:
+    """user_id берём из запроса, роль — только из ADMIN_IDS на сервере."""
+    claimed = message.get("user_id")
+    session.user_id = (
+        int(claimed) if isinstance(claimed, (int, str)) and str(claimed).isdigit() else None
+    )
+    session.is_admin = bool(session.user_id and session.user_id in settings.telegram.admin_ids)
+
+    await manager.connect(websocket, session.user_id, session.is_admin)
+    await _send(websocket, {"type": "auth_confirmed", "user_id": session.user_id})
+
+
+async def _handle_frame(websocket: WebSocket, session: _Session, data: str) -> None:
+    try:
+        message = json.loads(data)
+    except json.JSONDecodeError:
+        logger.warning("Received invalid JSON")
+        await _send(websocket, {"type": "error", "message": "Invalid JSON"})
+        return
+
+    msg_type = message.get("type")
+
+    if msg_type == "auth":
+        await _authenticate(websocket, session, message)
+    elif msg_type == "ping":
+        await _send(websocket, {"type": "pong"})
+    elif msg_type in {"subscribe", "unsubscribe"}:
+        if message.get("channel") == "trades":
+            verb = "subscribed to" if msg_type == "subscribe" else "unsubscribed from"
+            logger.info(f"User {session.user_id} {verb} trades")
+
+
 @ws_router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time updates."""
-    user_id: Optional[int] = None
-    is_admin = False
+    session = _Session()
 
     try:
         while True:
-            data = await websocket.receive_text()
-
-            try:
-                message = json.loads(data)
-                msg_type = message.get("type")
-
-                if msg_type == "auth":
-                    user_id = message.get("user_id")
-                    is_admin = message.get("is_admin", False)
-
-                    if is_admin:
-                        await manager.connect(websocket)
-                    else:
-                        await manager.connect(websocket, user_id)
-
-                    await manager.send_personal(
-                        {"type": "auth_confirmed", "user_id": user_id},
-                        user_id,
-                    )
-
-                elif msg_type == "ping":
-                    await websocket.send_text(json.dumps({"type": "pong"}))
-
-                elif msg_type == "subscribe":
-                    channel = message.get("channel")
-                    if channel == "trades":
-                        logger.info(f"User {user_id} subscribed to trades")
-
-                elif msg_type == "unsubscribe":
-                    channel = message.get("channel")
-                    if channel == "trades":
-                        logger.info(f"User {user_id} unsubscribed from trades")
-
-            except json.JSONDecodeError:
-                logger.warning("Received invalid JSON")
-                await websocket.send_text(
-                    json.dumps({"type": "error", "message": "Invalid JSON"})
-                )
-
+            await _handle_frame(websocket, session, await websocket.receive_text())
     except WebSocketDisconnect:
-        logger.info(f"WebSocket disconnected: user_id={user_id}")
-        manager.disconnect(websocket, user_id)
-
+        logger.info(f"WebSocket disconnected: user_id={session.user_id}")
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
-        manager.disconnect(websocket, user_id)
+    finally:
+        manager.disconnect(websocket, session.user_id, session.is_admin)
 
 
 async def notify_trade_update(user_id: int, trade_data: dict) -> None:

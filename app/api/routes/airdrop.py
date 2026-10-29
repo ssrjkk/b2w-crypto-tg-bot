@@ -77,11 +77,14 @@ async def get_user_campaigns(
                     "name": c["campaign"].name,
                     "protocol": c["campaign"].protocol,
                     "status": c["campaign"].status.value,
-                    "progress": {
-                        "status": c["progress"].status.value if c.get("progress") else None,
-                        "percent": c["progress"].progress_percent if c.get("progress") else 0,
-                    }
-                    if c.get("progress") else None,
+                    "progress": (
+                        {
+                            "status": c["progress"].status.value if c.get("progress") else None,
+                            "percent": c["progress"].progress_percent if c.get("progress") else 0,
+                        }
+                        if c.get("progress")
+                        else None
+                    ),
                 }
                 for c in campaigns
             ]

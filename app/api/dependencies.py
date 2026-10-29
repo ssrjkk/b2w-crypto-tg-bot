@@ -10,12 +10,14 @@ class Database:
 
     def __init__(self, path: str = "data/platform.db"):
         import aiosqlite
+
         self.path = path
         self._conn: Optional[aiosqlite.Connection] = None
 
     async def connect(self) -> None:
         """Initialize database connection."""
         import aiosqlite
+
         self._conn = await aiosqlite.connect(self.path)
         await self._create_tables()
 

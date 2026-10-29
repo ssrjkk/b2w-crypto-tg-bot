@@ -6,8 +6,7 @@ from typing import Optional
 import httpx
 
 from app.config.settings import get_settings
-from app.core.enums import Network, PaymentStatus
-from app.models.payment import Payment
+from app.core.enums import Network
 
 logger = logging.getLogger(__name__)
 

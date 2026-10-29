@@ -1,8 +1,7 @@
 """Background airdrop tasks."""
 
 import logging
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
 
 from celery import shared_task
 
@@ -14,15 +13,13 @@ def update_airdrop_progress(self) -> dict:
     """Update user progress for all airdrop campaigns."""
     from app.database.manager import get_db_manager
     from app.models.base import AirdropCampaignModel, AirdropProgressModel, AirdropStatus
-    from sqlalchemy import select, update
+    from sqlalchemy import select
 
     db = get_db_manager()
 
     try:
         async with db.session() as session:
-            campaigns_result = await session.execute(
-                select(AirdropCampaignModel)
-            )
+            campaigns_result = await session.execute(select(AirdropCampaignModel))
             campaigns = campaigns_result.scalars().all()
 
             updated_count = 0
@@ -71,8 +68,7 @@ def check_airdrop_eligibility(
             "campaign_id": campaign_id,
             "status": status.value,
             "results": [
-                {"rule_id": r.rule_id, "passed": r.passed, "reason": r.reason}
-                for r in results
+                {"rule_id": r.rule_id, "passed": r.passed, "reason": r.reason} for r in results
             ],
         }
     except Exception as e:

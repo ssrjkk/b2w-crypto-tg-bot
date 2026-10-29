@@ -7,7 +7,7 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.enums import ActionStatus, ActionType, RiskDecision
+from app.core.enums import ActionStatus, ActionType
 from app.models.base import DashboardEventModel
 from app.models.dashboard import DashboardEvent, DashboardSummary, EventCreate
 
@@ -96,8 +96,7 @@ class DashboardService:
     async def get_summary(self, user_id: int) -> DashboardSummary:
         """Get dashboard summary for user."""
         total_result = await self.db.execute(
-            select(func.count(DashboardEventModel.id))
-            .where(DashboardEventModel.user_id == user_id)
+            select(func.count(DashboardEventModel.id)).where(DashboardEventModel.user_id == user_id)
         )
         total_actions = total_result.scalar() or 0
 

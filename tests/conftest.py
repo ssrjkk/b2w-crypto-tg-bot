@@ -2,7 +2,6 @@
 
 import pytest
 import pytest_asyncio
-from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
 
 
@@ -63,12 +62,13 @@ def sample_payment():
 async def db_engine():
     """Create test database engine."""
     from sqlalchemy.ext.asyncio import create_async_engine
-    
+
     engine = create_async_engine(
         "sqlite+aiosqlite:///:memory:",
         echo=False,
     )
     from app.models.base import Base
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield engine

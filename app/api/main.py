@@ -106,6 +106,7 @@ def create_app() -> FastAPI:
 
         if settings.sentry.dsn:
             import sentry_sdk
+
             sentry_sdk.init(
                 dsn=settings.sentry.dsn,
                 environment=settings.environment,
@@ -119,9 +120,11 @@ def create_app() -> FastAPI:
         logger.info("API server shutting down")
 
         from app.database.manager import get_db_manager
+
         await get_db_manager().close()
 
         from app.cache.manager import get_cache
+
         await get_cache().close()
 
     return app

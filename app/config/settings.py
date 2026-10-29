@@ -1,7 +1,6 @@
 """Application configuration and settings."""
 
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -42,8 +41,12 @@ class AirdropSettings(BaseSettings):
 
 
 class CelerySettings(BaseSettings):
-    broker_url: str = Field(default="redis://localhost:6379/0", validation_alias="CELERY_BROKER_URL")
-    result_backend: str = Field(default="redis://localhost:6379/1", validation_alias="CELERY_RESULT_BACKEND")
+    broker_url: str = Field(
+        default="redis://localhost:6379/0", validation_alias="CELERY_BROKER_URL"
+    )
+    result_backend: str = Field(
+        default="redis://localhost:6379/1", validation_alias="CELERY_RESULT_BACKEND"
+    )
 
 
 class SentrySettings(BaseSettings):

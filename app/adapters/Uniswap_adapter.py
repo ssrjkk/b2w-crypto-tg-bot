@@ -1,7 +1,6 @@
 """Uniswap DEX adapter."""
 
 import logging
-from typing import Optional
 
 import httpx
 

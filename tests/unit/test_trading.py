@@ -27,16 +27,26 @@ class MockDexAdapter:
         return "10"
 
 
+def _db(trades_in_hour: int = 0):
+    """Risk-сервис оркестратора читает счётчик через `db.execute(...).scalar()`,
+    а запись о сделке пишется через add/commit/refresh той же сессии."""
+    result = MagicMock()
+    result.scalar = MagicMock(return_value=trades_in_hour)
+    result.scalar_one_or_none = MagicMock(return_value=None)
+    db = MagicMock()
+    db.execute = AsyncMock(return_value=result)
+    db.add = MagicMock()
+    db.commit = AsyncMock()
+    db.refresh = AsyncMock()
+    return db
+
+
 class TestTradingOrchestrator:
     """Tests for TradingOrchestrator."""
 
     @pytest.fixture
     def mock_db(self):
-        db = MagicMock()
-        db.execute = AsyncMock(return_value=MagicMock(lastrowid=1))
-        db.fetchone = AsyncMock(return_value=None)
-        db.fetchall = AsyncMock(return_value=[])
-        return db
+        return _db()
 
     @pytest.fixture
     def risk_service(self, mock_db):
@@ -60,14 +70,15 @@ class TestTradingOrchestrator:
         assert adapter is None
 
     @pytest.mark.asyncio
-    async def test_execute_trade_rejected_by_risk(self, orchestrator, mock_db):
+    async def test_execute_trade_rejected_by_risk(self):
         """Test trade execution rejected by risk service."""
-        mock_db.execute = AsyncMock(return_value=MagicMock(lastrowid=1))
-        mock_db.fetchone = AsyncMock(return_value={"count": 10})
+        db = _db(trades_in_hour=10)
+        orch = TradingOrchestrator(db, RiskService(db))
+        orch.register_adapter(DexName.GMX, Network.ARBITRUM, MockDexAdapter())
 
         from app.models.trading import TradeRequest
 
-        result = await orchestrator.execute_trade(
+        result = await orch.execute_trade(
             TradeRequest(
                 user_id=1,
                 dex=DexName.GMX,

@@ -40,7 +40,9 @@ async def log_event(
                 user_id=request.user_id,
                 action_type=ActionType(request.action_type),
                 status=ActionStatus(request.status),
-                risk_decision=RiskDecision(request.risk_decision) if request.risk_decision else None,
+                risk_decision=(
+                    RiskDecision(request.risk_decision) if request.risk_decision else None
+                ),
                 description=request.description,
                 reason=request.reason,
                 result=request.result,

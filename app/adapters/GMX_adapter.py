@@ -193,9 +193,7 @@ class GMXAdapter(BaseDexAdapter):
             )
 
         price = Decimal(market.mark_price)
-        amount_dec = Decimal(amount)
 
-        estimated_output = amount_dec * price
         price_impact = abs(market.price_change_24h)
 
         gas = await self.api.get_gas_price()

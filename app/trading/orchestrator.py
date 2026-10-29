@@ -8,13 +8,13 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.adapters.base import BaseDexAdapter, ExecutionResult, QuoteResult
+from app.adapters.base import BaseDexAdapter
 from app.config.settings import get_settings
-from app.core.enums import ActionStatus, DexName, Network, OrderSide, OrderType, RiskDecision
+from app.core.enums import ActionStatus, DexName, Network, RiskDecision
 from app.core.exceptions import QuoteError
 from app.models.base import TradeModel
-from app.models.trading import Quote, QuoteRequest, Trade, TradeRequest
-from app.services.risk_service import RiskCheckResult, RiskService
+from app.models.trading import Quote, QuoteRequest, TradeRequest
+from app.services.risk_service import RiskService
 
 logger = logging.getLogger(__name__)
 
@@ -224,9 +224,7 @@ class TradingOrchestrator:
         error_message: Optional[str] = None,
     ) -> None:
         """Update trade status in database."""
-        result = await self.db.execute(
-            select(TradeModel).where(TradeModel.id == trade_id)
-        )
+        result = await self.db.execute(select(TradeModel).where(TradeModel.id == trade_id))
         trade = result.scalar_one_or_none()
 
         if trade:

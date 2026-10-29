@@ -5,7 +5,14 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from app.core.enums import ActionStatus, ActionType, DexName, Network, OrderSide, OrderType, RiskDecision
+from app.core.enums import (
+    ActionStatus,
+    DexName,
+    Network,
+    OrderSide,
+    OrderType,
+    RiskDecision,
+)
 
 
 class QuoteRequest(BaseModel):

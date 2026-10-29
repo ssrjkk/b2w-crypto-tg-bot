@@ -4,10 +4,9 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 from app.core.enums import ActionStatus, ActionType, RiskDecision
-from app.core.exceptions import TradingError
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +65,7 @@ class ActionQueueService:
 
     async def get_status(self, action_id: int) -> Optional[QueuedAction]:
         """Get action status."""
-        row = await self.db.fetchone(
-            "SELECT * FROM action_queue WHERE id = ?", (action_id,)
-        )
+        row = await self.db.fetchone("SELECT * FROM action_queue WHERE id = ?", (action_id,))
         if not row:
             return None
 
@@ -82,7 +79,9 @@ class ActionQueueService:
             error_message=row.get("error_message"),
             created_at=datetime.fromisoformat(row["created_at"]) if row.get("created_at") else None,
             started_at=datetime.fromisoformat(row["started_at"]) if row.get("started_at") else None,
-            completed_at=datetime.fromisoformat(row["completed_at"]) if row.get("completed_at") else None,
+            completed_at=(
+                datetime.fromisoformat(row["completed_at"]) if row.get("completed_at") else None
+            ),
         )
 
     async def get_user_actions(
@@ -93,7 +92,7 @@ class ActionQueueService:
         """Get user's action history."""
         rows = await self.db.fetchall(
             """
-            SELECT * FROM action_queue 
+            SELECT * FROM action_queue
             WHERE user_id = ?
             ORDER BY created_at DESC
             LIMIT ?
@@ -107,11 +106,19 @@ class ActionQueueService:
                 action_type=ActionType(row["action_type"]),
                 status=ActionStatus(row["status"]),
                 payload=eval(row["payload"]),
-                risk_decision=RiskDecision(row["risk_decision"]) if row.get("risk_decision") else None,
+                risk_decision=(
+                    RiskDecision(row["risk_decision"]) if row.get("risk_decision") else None
+                ),
                 error_message=row.get("error_message"),
-                created_at=datetime.fromisoformat(row["created_at"]) if row.get("created_at") else None,
-                started_at=datetime.fromisoformat(row["started_at"]) if row.get("started_at") else None,
-                completed_at=datetime.fromisoformat(row["completed_at"]) if row.get("completed_at") else None,
+                created_at=(
+                    datetime.fromisoformat(row["created_at"]) if row.get("created_at") else None
+                ),
+                started_at=(
+                    datetime.fromisoformat(row["started_at"]) if row.get("started_at") else None
+                ),
+                completed_at=(
+                    datetime.fromisoformat(row["completed_at"]) if row.get("completed_at") else None
+                ),
             )
             for row in rows
         ]
@@ -127,7 +134,7 @@ class ActionQueueService:
 
         await self.db.execute(
             """
-            UPDATE action_queue 
+            UPDATE action_queue
             SET status = ?, updated_at = ?
             WHERE id = ?
             """,
@@ -201,9 +208,13 @@ class ActionQueueService:
         now = datetime.utcnow().isoformat()
         await self.db.execute(
             f"""
-            UPDATE action_queue 
-            SET status = ?, {f'result = ?, ' if result else ''}{f'error_message = ?, ' if error else ''}updated_at = ?
+            UPDATE action_queue
+            SET status = ?, {'result = ?, ' if result else ''}{'error_message = ?, ' if error else ''}updated_at = ?
             WHERE id = ?
             """,
-            [s for s in [status.value, str(result) if result else None, error, now, action_id] if s is not None],
+            [
+                s
+                for s in [status.value, str(result) if result else None, error, now, action_id]
+                if s is not None
+            ],
         )

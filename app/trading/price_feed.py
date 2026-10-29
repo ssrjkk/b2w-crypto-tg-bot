@@ -93,13 +93,17 @@ class CoinGeckoPriceFeed(PriceFeed):
                         volume_24h=price_data.get("usd_24h_vol", 0),
                         timestamp=response.headers.get("date", ""),
                     )
-                    await cache.set(cache_key, {
-                        "token": result.token,
-                        "price_usd": str(result.price_usd),
-                        "change_24h": result.change_24h,
-                        "volume_24h": result.volume_24h,
-                        "timestamp": result.timestamp,
-                    }, ttl=60)
+                    await cache.set(
+                        cache_key,
+                        {
+                            "token": result.token,
+                            "price_usd": str(result.price_usd),
+                            "change_24h": result.change_24h,
+                            "volume_24h": result.volume_24h,
+                            "timestamp": result.timestamp,
+                        },
+                        ttl=60,
+                    )
                     return result
 
         except Exception as e:

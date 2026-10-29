@@ -1,7 +1,7 @@
 """Dashboard models."""
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
 

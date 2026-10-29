@@ -47,6 +47,7 @@ async def get_quote(
 
     try:
         from app.models.trading import QuoteRequest
+
         quote = await orchestrator.get_quote(
             QuoteRequest(
                 user_id=request.user_id,
@@ -84,6 +85,7 @@ async def execute_trade(
 
     try:
         from app.models.trading import TradeRequest
+
         result = await orchestrator.execute_trade(
             TradeRequest(
                 user_id=request.user_id,

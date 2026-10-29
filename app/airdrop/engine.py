@@ -11,7 +11,6 @@ from app.airdrop.rules import RulesEngine, RuleResult
 from app.config.settings import get_settings
 from app.core.enums import AirdropStatus
 from app.models.base import AirdropCampaignModel, AirdropProgressModel
-from app.models.airdrop import AirdropCampaign, AirdropProgress
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +36,7 @@ class AirdropEngine:
 
         eligibility_rules = campaign.eligibility_rules.get("rules", [])
 
-        passed, results = await self.rules_engine.evaluate_rules(
-            eligibility_rules, user_data
-        )
+        passed, results = await self.rules_engine.evaluate_rules(eligibility_rules, user_data)
 
         if passed:
             return AirdropStatus.ELIGIBLE, results
@@ -82,10 +79,12 @@ class AirdropEngine:
 
         for campaign in campaigns:
             progress = await self._get_progress(user_id, campaign.id)
-            result.append({
-                "campaign": campaign,
-                "progress": progress,
-            })
+            result.append(
+                {
+                    "campaign": campaign,
+                    "progress": progress,
+                }
+            )
 
         return result
 

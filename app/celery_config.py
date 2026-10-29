@@ -1,7 +1,6 @@
 """Celery configuration and background tasks."""
 
 import logging
-from typing import Optional
 
 from celery import Celery
 from celery.schedules import crontab

@@ -97,7 +97,6 @@ async def main():
     db = await get_database()
     await init_services(db)
 
-    from app.api.main import app as fastapi_app
     import uvicorn
 
     uvicorn.run(
@@ -110,4 +109,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

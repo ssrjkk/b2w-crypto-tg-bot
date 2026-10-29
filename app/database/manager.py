@@ -90,6 +90,7 @@ class DatabaseManager:
             return
 
         from app.models.base import Base
+
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 

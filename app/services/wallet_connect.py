@@ -1,6 +1,5 @@
 """Wallet Connect v2 integration."""
 
-import json
 import logging
 import secrets
 from abc import ABC, abstractmethod

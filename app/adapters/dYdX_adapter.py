@@ -255,9 +255,7 @@ class DyDxAdapter(BaseDexAdapter):
             )
 
         price = Decimal(market_data.price)
-        amount_dec = Decimal(amount)
 
-        estimated_output = amount_dec * price
         price_change = abs(float(market_data.priceChange24h or "0"))
         price_impact = price_change / 100 if price_change > 0 else 0.1
 

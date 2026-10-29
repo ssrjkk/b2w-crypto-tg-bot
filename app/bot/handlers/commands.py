@@ -40,24 +40,28 @@ async def cmd_help(message: Message) -> None:
 async def cmd_dashboard(message: Message) -> None:
     """Handle /dashboard command."""
     from app.bot.handlers.messages import handle_dashboard
+
     await handle_dashboard(message)
 
 
 async def cmd_subscribe(message: Message) -> None:
     """Handle /subscribe command."""
     from app.bot.handlers.messages import handle_subscribe
+
     await handle_subscribe(message)
 
 
 async def cmd_trade(message: Message) -> None:
     """Handle /trade command."""
     from app.bot.handlers.messages import handle_trade_menu
+
     await handle_trade_menu(message)
 
 
 async def cmd_airdrops(message: Message) -> None:
     """Handle /airdrops command."""
     from app.bot.handlers.messages import handle_airdrops_menu
+
     await handle_airdrops_menu(message)
 
 

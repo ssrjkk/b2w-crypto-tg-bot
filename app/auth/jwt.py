@@ -8,7 +8,6 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import get_settings
 
@@ -38,7 +37,9 @@ class AuthService:
         self.secret_key = settings.telegram.bot_token or "dev-secret-key"
         self.access_token_expire_minutes = 60 * 24 * 7
 
-    def create_access_token(self, user_id: int, telegram_id: int, username: Optional[str] = None) -> Token:
+    def create_access_token(
+        self, user_id: int, telegram_id: int, username: Optional[str] = None
+    ) -> Token:
         """Create JWT access token."""
         expire = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
 
@@ -83,7 +84,9 @@ class AuthService:
     def decode_token_unsafe(self, token: str) -> Optional[TokenData]:
         """Decode token without verification (for logging)."""
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=[ALGORITHM], options={"verify_signature": False})
+            payload = jwt.decode(
+                token, self.secret_key, algorithms=[ALGORITHM], options={"verify_signature": False}
+            )
             return TokenData(
                 user_id=payload.get("user_id"),
                 telegram_id=payload.get("telegram_id"),
@@ -146,20 +149,21 @@ class WebSocketAuth:
 def create_token_from_telegram(init_data: str) -> Token:
     """Create JWT token from Telegram initData."""
     import urllib.parse
-    
+
     auth_service = AuthService()
-    
+
     try:
         params = urllib.parse.parse_qs(init_data)
-        user_data = params.get('user', [{}])[0]
-        
+        user_data = params.get("user", [{}])[0]
+
         if isinstance(user_data, str):
             import json
+
             user_data = json.loads(user_data)
-        
-        telegram_id = int(user_data.get('id', 0))
-        username = user_data.get('username')
-        
+
+        telegram_id = int(user_data.get("id", 0))
+        username = user_data.get("username")
+
         return auth_service.create_access_token(
             user_id=telegram_id,
             telegram_id=telegram_id,

@@ -1,8 +1,17 @@
 """SQLAlchemy base and models with optimized indexes."""
 
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Float, Text, JSON, Enum as SQLEnum, Index
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Boolean,
+    DateTime,
+    Float,
+    Text,
+    JSON,
+    Enum as SQLEnum,
+    Index,
+)
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.sql import func
 
@@ -13,20 +22,20 @@ from app.core.enums import (
     ActionType,
     ActionStatus,
     AirdropStatus,
-    RiskDecision,
 )
 
 
 class Base(DeclarativeBase):
     """Base class for all models."""
+
     pass
 
 
 class UserModel(Base):
     __tablename__ = "users"
     __table_args__ = (
-        Index('ix_users_telegram_id', 'telegram_id'),
-        Index('ix_users_username', 'username'),
+        Index("ix_users_telegram_id", "telegram_id"),
+        Index("ix_users_username", "username"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -44,9 +53,9 @@ class UserModel(Base):
 class SubscriptionModel(Base):
     __tablename__ = "subscriptions"
     __table_args__ = (
-        Index('ix_subscriptions_user_id', 'user_id'),
-        Index('ix_subscriptions_status', 'status'),
-        Index('ix_subscriptions_expiry', 'expiry_date'),
+        Index("ix_subscriptions_user_id", "user_id"),
+        Index("ix_subscriptions_status", "status"),
+        Index("ix_subscriptions_expiry", "expiry_date"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -62,10 +71,10 @@ class SubscriptionModel(Base):
 class PaymentModel(Base):
     __tablename__ = "payments"
     __table_args__ = (
-        Index('ix_payments_user_id', 'user_id'),
-        Index('ix_payments_status', 'status'),
-        Index('ix_payments_expires', 'expires_at'),
-        Index('ix_payments_tx_hash', 'transaction_hash'),
+        Index("ix_payments_user_id", "user_id"),
+        Index("ix_payments_status", "status"),
+        Index("ix_payments_expires", "expires_at"),
+        Index("ix_payments_tx_hash", "transaction_hash"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -85,10 +94,10 @@ class PaymentModel(Base):
 class TradeModel(Base):
     __tablename__ = "trades"
     __table_args__ = (
-        Index('ix_trades_user_id', 'user_id'),
-        Index('ix_trades_status', 'status'),
-        Index('ix_trades_created', 'created_at'),
-        Index('ix_trades_dex_network', 'dex', 'network'),
+        Index("ix_trades_user_id", "user_id"),
+        Index("ix_trades_status", "status"),
+        Index("ix_trades_created", "created_at"),
+        Index("ix_trades_dex_network", "dex", "network"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -113,8 +122,8 @@ class TradeModel(Base):
 class ActionQueueModel(Base):
     __tablename__ = "action_queue"
     __table_args__ = (
-        Index('ix_action_queue_user_id', 'user_id'),
-        Index('ix_action_queue_status', 'status'),
+        Index("ix_action_queue_user_id", "user_id"),
+        Index("ix_action_queue_status", "status"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -133,9 +142,7 @@ class ActionQueueModel(Base):
 
 class AirdropCampaignModel(Base):
     __tablename__ = "airdrop_campaigns"
-    __table_args__ = (
-        Index('ix_airdrop_campaigns_status', 'status'),
-    )
+    __table_args__ = (Index("ix_airdrop_campaigns_status", "status"),)
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False)
@@ -151,9 +158,7 @@ class AirdropCampaignModel(Base):
 
 class AirdropProgressModel(Base):
     __tablename__ = "airdrop_progress"
-    __table_args__ = (
-        Index('ix_airdrop_progress_user_campaign', 'user_id', 'campaign_id'),
-    )
+    __table_args__ = (Index("ix_airdrop_progress_user_campaign", "user_id", "campaign_id"),)
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False)
@@ -169,9 +174,9 @@ class AirdropProgressModel(Base):
 class DashboardEventModel(Base):
     __tablename__ = "dashboard_events"
     __table_args__ = (
-        Index('ix_dashboard_events_user_id', 'user_id'),
-        Index('ix_dashboard_events_created', 'created_at'),
-        Index('ix_dashboard_events_action_status', 'action_type', 'status'),
+        Index("ix_dashboard_events_user_id", "user_id"),
+        Index("ix_dashboard_events_created", "created_at"),
+        Index("ix_dashboard_events_action_status", "action_type", "status"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

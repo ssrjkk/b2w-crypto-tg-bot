@@ -37,9 +37,7 @@ class PaymentService:
     ) -> PaymentModel:
         """Create a payment invoice."""
         settings = get_settings()
-        expiry = datetime.utcnow() + timedelta(
-            minutes=settings.payment.invoice_expiry_minutes
-        )
+        expiry = datetime.utcnow() + timedelta(minutes=settings.payment.invoice_expiry_minutes)
 
         address = self._generate_crypto_address(network)
 
@@ -56,7 +54,9 @@ class PaymentService:
         await self.db.commit()
         await self.db.refresh(payment)
 
-        logger.info(f"Created invoice {payment.id} for user {user_id}: {amount} {token} on {network.value}")
+        logger.info(
+            f"Created invoice {payment.id} for user {user_id}: {amount} {token} on {network.value}"
+        )
         return payment
 
     async def verify_payment(
@@ -120,9 +120,7 @@ class PaymentService:
 
     async def _get_payment(self, payment_id: int) -> Optional[PaymentModel]:
         """Internal method to get payment by ID."""
-        result = await self.db.execute(
-            select(PaymentModel).where(PaymentModel.id == payment_id)
-        )
+        result = await self.db.execute(select(PaymentModel).where(PaymentModel.id == payment_id))
         return result.scalar_one_or_none()
 
     async def _get_payment_by_user(self, user_id: int) -> Optional[PaymentModel]:

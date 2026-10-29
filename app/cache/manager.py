@@ -44,7 +44,7 @@ class CacheManager:
     @property
     def redis(self) -> Redis:
         if not self._redis:
-            redis_url = getattr(settings, 'redis_url', 'redis://localhost:6379/0')
+            redis_url = getattr(settings, "redis_url", "redis://localhost:6379/0")
             self._redis = redis.from_url(
                 redis_url,
                 decode_responses=True,
@@ -204,6 +204,7 @@ def get_query_cache() -> QueryCache:
 
 def cached(ttl: int = 300, key_prefix: str = ""):
     """Decorator for caching async function results."""
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -216,5 +217,7 @@ def cached(ttl: int = 300, key_prefix: str = ""):
             result = await func(*args, **kwargs)
             await cache.set(key, result, ttl)
             return result
+
         return wrapper
+
     return decorator

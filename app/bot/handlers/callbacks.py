@@ -3,17 +3,10 @@
 import logging
 
 from aiogram import Dispatcher
-from aiogram.filters import Command
 from aiogram.types import CallbackQuery
 
 from app.bot.keyboards import (
-    get_airdrop_keyboard,
-    get_confirm_keyboard,
-    get_dashboard_keyboard,
     get_main_keyboard,
-    get_network_keyboard,
-    get_subscribe_keyboard,
-    get_trade_keyboard,
 )
 
 logger = logging.getLogger(__name__)
@@ -22,6 +15,7 @@ logger = logging.getLogger(__name__)
 async def cb_dashboard(callback: CallbackQuery) -> None:
     """Handle dashboard callback."""
     from app.bot.handlers.messages import handle_dashboard
+
     await callback.message.answer("Loading dashboard...")
     await handle_dashboard(callback.message)
     await callback.answer()
@@ -30,6 +24,7 @@ async def cb_dashboard(callback: CallbackQuery) -> None:
 async def cb_subscribe(callback: CallbackQuery) -> None:
     """Handle subscribe callback."""
     from app.bot.handlers.messages import handle_subscribe
+
     await handle_subscribe(callback.message)
     await callback.answer()
 
@@ -37,6 +32,7 @@ async def cb_subscribe(callback: CallbackQuery) -> None:
 async def cb_trade(callback: CallbackQuery) -> None:
     """Handle trade callback."""
     from app.bot.handlers.messages import handle_trade_menu
+
     await handle_trade_menu(callback.message)
     await callback.answer()
 
@@ -44,6 +40,7 @@ async def cb_trade(callback: CallbackQuery) -> None:
 async def cb_airdrops(callback: CallbackQuery) -> None:
     """Handle airdrops callback."""
     from app.bot.handlers.messages import handle_airdrops_menu
+
     await handle_airdrops_menu(callback.message)
     await callback.answer()
 
@@ -70,7 +67,6 @@ async def cb_subscribe_token(callback: CallbackQuery) -> None:
     token = callback.data.replace("subscribe_", "")
     try:
         from app.main import get_services
-        from app.payments.invoice import PaymentService
 
         payment_service = get_services()["payment"]
         user_id = callback.from_user.id
@@ -82,7 +78,7 @@ async def cb_subscribe_token(callback: CallbackQuery) -> None:
             network="arbitrum",
         )
 
-        text = f"💳 *Payment Invoice*\n\n"
+        text = "💳 *Payment Invoice*\n\n"
         text += f"Amount: {invoice.amount} {invoice.token}\n"
         text += f"Network: {invoice.network.value}\n"
         text += f"Address: `{invoice.address}`\n\n"

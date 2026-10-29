@@ -66,13 +66,14 @@ async def get_subscription_status(
     sub = await service.get_user_subscription(user_id)
     if not sub:
         raise HTTPException(status_code=404, detail="No active subscription")
-    
+
     days_remaining = None
     if sub.expiry_date:
         from datetime import datetime
+
         delta = sub.expiry_date - datetime.utcnow()
         days_remaining = max(0, delta.days)
-    
+
     return {
         "id": sub.id,
         "user_id": sub.user_id,

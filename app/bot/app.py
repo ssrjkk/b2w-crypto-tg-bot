@@ -46,6 +46,7 @@ class BotApplication:
             return
 
         import asyncio
+
         asyncio.run(self._run_polling())
 
     async def _run_polling(self) -> None:

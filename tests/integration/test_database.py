@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from app.models.base import Base, UserModel, SubscriptionModel, SubscriptionStatus
-from app.database.manager import DatabaseManager
 
 
 @pytest_asyncio.fixture
@@ -91,6 +90,7 @@ class TestDatabaseModels:
         await db_session.commit()
 
         from sqlalchemy import select
+
         result = await db_session.execute(
             select(UserModel).where(UserModel.telegram_id == "123456")
         )

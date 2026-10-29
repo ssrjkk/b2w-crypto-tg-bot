@@ -1,7 +1,7 @@
 """Airdrop eligibility rules engine."""
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 
 @dataclass

@@ -13,8 +13,7 @@ def check_expired_payments(self) -> dict:
     """Check and expire pending payments."""
     from app.database.manager import get_db_manager
     from app.models.base import PaymentModel, PaymentStatus
-    from sqlalchemy import select, update
-    from sqlalchemy.ext.asyncio import AsyncSession
+    from sqlalchemy import update
 
     db = get_db_manager()
 
@@ -73,7 +72,7 @@ def activate_subscription_on_payment(user_id: int, payment_id: int) -> dict:
     """Activate subscription after payment confirmation."""
     from app.database.manager import get_db_manager
     from app.models.base import SubscriptionModel, SubscriptionStatus
-    from sqlalchemy import select, update
+    from sqlalchemy import update
 
     db = get_db_manager()
 

@@ -8,7 +8,6 @@ from app.airdrop.rules import (
     MinTradesRule,
     NetworkActivityRule,
     HoldingDurationRule,
-    RuleResult,
 )
 
 

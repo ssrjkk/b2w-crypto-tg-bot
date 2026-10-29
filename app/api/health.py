@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.database.manager import get_db_manager, DatabaseManager
@@ -70,12 +70,16 @@ async def readiness(db_manager: DatabaseManager = Depends(get_db_manager)) -> He
     else:
         checks["telegram"] = ComponentHealth(name="telegram", status="not_configured")
 
-    rpc_configured = any([
-        settings.payment.rpc_url_eth,
-        settings.payment.rpc_url_arbitrum,
-        settings.payment.rpc_url_optimism,
-    ])
-    checks["rpc"] = ComponentHealth(name="rpc", status="configured" if rpc_configured else "not_configured")
+    rpc_configured = any(
+        [
+            settings.payment.rpc_url_eth,
+            settings.payment.rpc_url_arbitrum,
+            settings.payment.rpc_url_optimism,
+        ]
+    )
+    checks["rpc"] = ComponentHealth(
+        name="rpc", status="configured" if rpc_configured else "not_configured"
+    )
 
     return HealthStatus(
         status=overall_status,
@@ -100,10 +104,16 @@ async def metrics() -> dict:
             result = await session.execute(text("SELECT COUNT(*) as count FROM users"))
             metrics_data["total_users"] = result.scalar()
 
-            result = await session.execute(text("SELECT COUNT(*) as count FROM subscriptions WHERE status = 'active'"))
+            result = await session.execute(
+                text("SELECT COUNT(*) as count FROM subscriptions WHERE status = 'active'")
+            )
             metrics_data["active_subscriptions"] = result.scalar()
 
-            result = await session.execute(text("SELECT COUNT(*) as count FROM trades WHERE created_at > NOW() - INTERVAL '24 hours'"))
+            result = await session.execute(
+                text(
+                    "SELECT COUNT(*) as count FROM trades WHERE created_at > NOW() - INTERVAL '24 hours'"
+                )
+            )
             metrics_data["trades_24h"] = result.scalar()
     except Exception:
         pass

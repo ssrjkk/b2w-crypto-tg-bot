@@ -3,7 +3,7 @@
 import logging
 from typing import Optional
 
-from app.core.enums import ActionStatus, RiskDecision
+from app.core.enums import ActionStatus
 
 logger = logging.getLogger(__name__)
 
@@ -67,12 +67,12 @@ class AlertingService:
         if not self.bot:
             return
 
-        message = f"🛑 *Action Blocked*\n\n"
+        message = "🛑 *Action Blocked*\n\n"
         message += f"*Type:* {action_type}\n"
         message += f"*Reason:* {reason}\n"
 
         if details:
-            message += f"\n*Details:*\n"
+            message += "\n*Details:*\n"
             for k, v in details.items():
                 message += f"  - {k}: {v}\n"
 
@@ -92,10 +92,10 @@ class AlertingService:
         if not self.bot:
             return
 
-        message = f"💰 *Payment Received*\n\n"
+        message = "💰 *Payment Received*\n\n"
         message += f"*Amount:* {amount} {token}\n"
         message += f"*Tx:* `{tx_hash[:16]}...`\n\n"
-        message += f"Processing activation..."
+        message += "Processing activation..."
 
         try:
             await self.bot.send_message(chat_id, message, parse_mode="Markdown")
@@ -111,10 +111,10 @@ class AlertingService:
         if not self.bot:
             return
 
-        message = f"🎉 *Subscription Activated*\n\n"
-        message += f"Your premium subscription is now active!\n"
+        message = "🎉 *Subscription Activated*\n\n"
+        message += "Your premium subscription is now active!\n"
         message += f"*Expires:* {expiry_date}\n\n"
-        message += f"Use /help to see available commands."
+        message += "Use /help to see available commands."
 
         try:
             await self.bot.send_message(chat_id, message, parse_mode="Markdown")
@@ -131,7 +131,7 @@ class AlertingService:
         if not self.bot:
             return
 
-        message = f"⚠️ *Error*\n\n"
+        message = "⚠️ *Error*\n\n"
         message += f"_{error_message}_\n"
         if action_type:
             message += f"\n*Action:* {action_type}"

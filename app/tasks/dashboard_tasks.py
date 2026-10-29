@@ -20,9 +20,7 @@ def cleanup_old_events(days_to_keep: int = 90) -> dict:
     try:
         async with db.session() as session:
             cutoff = datetime.utcnow() - timedelta(days=days_to_keep)
-            stmt = delete(DashboardEventModel).where(
-                DashboardEventModel.created_at < cutoff
-            )
+            stmt = delete(DashboardEventModel).where(DashboardEventModel.created_at < cutoff)
             result = await session.execute(stmt)
 
             return {
@@ -49,14 +47,14 @@ def generate_daily_report() -> dict:
             yesterday = datetime.utcnow() - timedelta(days=1)
 
             events_result = await session.execute(
-                select(func.count(DashboardEventModel.id))
-                .where(DashboardEventModel.created_at > yesterday)
+                select(func.count(DashboardEventModel.id)).where(
+                    DashboardEventModel.created_at > yesterday
+                )
             )
             total_events = events_result.scalar()
 
             trades_result = await session.execute(
-                select(func.count(TradeModel.id))
-                .where(TradeModel.created_at > yesterday)
+                select(func.count(TradeModel.id)).where(TradeModel.created_at > yesterday)
             )
             total_trades = trades_result.scalar()
 
