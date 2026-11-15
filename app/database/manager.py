@@ -18,8 +18,6 @@ def get_database_url() -> str:
     db_path = settings.database.path
     if db_path.startswith("postgresql"):
         return db_path
-    if db_path.endswith(".db"):
-        return f"sqlite+aiosqlite:///{db_path}"
     return f"sqlite+aiosqlite:///{db_path}"
 
 

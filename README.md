@@ -152,38 +152,7 @@ pytest tests/ -v --cov=app
 
 ### Docker Compose
 
-```yaml
-version: '3.8'
-services:
-  api:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE__PATH=postgresql://postgres:password@db:5432/platform
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
-
-  celery:
-    build: .
-    command: celery -A app.celery_config worker --loglevel=info
-    environment:
-      - DATABASE__PATH=postgresql://postgres:password@db:5432/platform
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
-
-  db:
-    image: postgres:15
-    environment:
-      - POSTGRES_PASSWORD=password
-
-  redis:
-    image: redis:7
-```
+Полный рабочий файл — `docker-compose.yml` в корне репозитория: api, celery-worker, celery-beat, nginx, postgres:15-alpine, redis. Переменные окружения задаются через `.env` (`DATABASE__PATH`, `REDIS_URL`, `TELEGRAM_BOT_TOKEN`, `RPC_URL_*`, `SENTRY_DSN`; значения по умолчанию — внутри compose).
 
 ### Security Checklist
 
