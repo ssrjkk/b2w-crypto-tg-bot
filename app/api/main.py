@@ -89,11 +89,15 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(ws_router, tags=["websocket"])
-    app.include_router(subscription.router, prefix="/api")
-    app.include_router(payment.router, prefix="/api")
-    app.include_router(trading.router, prefix="/api")
-    app.include_router(airdrop.router, prefix="/api")
-    app.include_router(dashboard.router, prefix="/api")
+    # Nested prefixes are the documented contract: the Mini App calls
+    # /api/trading/quote, /api/payment/invoice and README lists the same
+    # paths. Flat mounting also made GET /api/status/{user_id} ambiguous —
+    # subscription's handler shadowed the payment one.
+    app.include_router(subscription.router, prefix="/api/subscription")
+    app.include_router(payment.router, prefix="/api/payment")
+    app.include_router(trading.router, prefix="/api/trading")
+    app.include_router(airdrop.router, prefix="/api/airdrop")
+    app.include_router(dashboard.router, prefix="/api/dashboard")
 
     @app.on_event("startup")
     async def startup_event():

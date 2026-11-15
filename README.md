@@ -5,10 +5,6 @@
 
 Telegram bot for crypto portfolio tracking and alerts. Monitors prices, sends notifications, and provides market analysis.
 
-## Features
-
-
-
 A production-ready Telegram-based crypto trading platform with subscription management, perpetual DEX trading, airdrop tracking, and comprehensive risk management.
 
 ## Features
@@ -142,6 +138,7 @@ pytest tests/ -v --cov=app
 - `POST /api/dashboard/event`
 - `GET /api/dashboard/events/{user_id}`
 - `GET /api/dashboard/summary/{user_id}`
+- `GET /api/dashboard/history/{user_id}`
 
 ## Background Tasks (Celery)
 
