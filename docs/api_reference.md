@@ -1,10 +1,12 @@
 # API Reference
 
+> Полный список из 18 эндпоинтов — в README; здесь — основные с примерами запросов.
+
 ## Subscription Endpoints
 
 ### Create Subscription
 ```
-POST /subscription/create
+POST /api/subscription/create
 ```
 
 Request:
@@ -29,7 +31,7 @@ Response:
 
 ### Check Access
 ```
-GET /subscription/check-access/{user_id}
+GET /api/subscription/check-access/{user_id}
 ```
 
 Response:
@@ -43,7 +45,7 @@ Response:
 
 ### Create Invoice
 ```
-POST /payment/invoice
+POST /api/payment/invoice
 ```
 
 Request:
@@ -70,7 +72,7 @@ Response:
 
 ### Verify Payment
 ```
-POST /payment/verify
+POST /api/payment/verify
 ```
 
 Request:
@@ -88,7 +90,7 @@ Request:
 
 ### Get Quote
 ```
-POST /trading/quote
+POST /api/trading/quote
 ```
 
 Request:
@@ -107,7 +109,7 @@ Request:
 
 ### Execute Trade
 ```
-POST /trading/execute
+POST /api/trading/execute
 ```
 
 Request:
@@ -129,7 +131,7 @@ Request:
 
 ### Check Eligibility
 ```
-POST /airdrop/check-eligibility
+POST /api/airdrop/check-eligibility
 ```
 
 Request:
@@ -148,10 +150,10 @@ Request:
 
 ### Get Events
 ```
-GET /dashboard/events/{user_id}?limit=50
+GET /api/dashboard/events/{user_id}?limit=50
 ```
 
 ### Get Summary
 ```
-GET /dashboard/summary/{user_id}
+GET /api/dashboard/summary/{user_id}
 ```
