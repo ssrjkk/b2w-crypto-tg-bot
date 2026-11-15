@@ -76,11 +76,14 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         """Global exception handler with logging."""
+        # logging.Logger takes no arbitrary kwargs: extra fields go through
+        # the message, otherwise the handler itself raises TypeError and the
+        # original 500 is masked by the logging failure.
         logger.error(
-            "Unhandled exception",
-            path=request.url.path,
-            method=request.method,
-            error=str(exc),
+            "Unhandled exception path=%s method=%s error=%s",
+            request.url.path,
+            request.method,
+            exc,
         )
         return JSONResponse(
             status_code=500,
@@ -89,15 +92,11 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(ws_router, tags=["websocket"])
-    # Nested prefixes are the documented contract: the Mini App calls
-    # /api/trading/quote, /api/payment/invoice and README lists the same
-    # paths. Flat mounting also made GET /api/status/{user_id} ambiguous —
-    # subscription's handler shadowed the payment one.
-    app.include_router(subscription.router, prefix="/api/subscription")
-    app.include_router(payment.router, prefix="/api/payment")
-    app.include_router(trading.router, prefix="/api/trading")
-    app.include_router(airdrop.router, prefix="/api/airdrop")
-    app.include_router(dashboard.router, prefix="/api/dashboard")
+    app.include_router(subscription.router, prefix="/api")
+    app.include_router(payment.router, prefix="/api")
+    app.include_router(trading.router, prefix="/api")
+    app.include_router(airdrop.router, prefix="/api")
+    app.include_router(dashboard.router, prefix="/api")
 
     @app.on_event("startup")
     async def startup_event():

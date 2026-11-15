@@ -138,7 +138,6 @@ pytest tests/ -v --cov=app
 - `POST /api/dashboard/event`
 - `GET /api/dashboard/events/{user_id}`
 - `GET /api/dashboard/summary/{user_id}`
-- `GET /api/dashboard/history/{user_id}`
 
 ## Background Tasks (Celery)
 
