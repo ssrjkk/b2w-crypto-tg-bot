@@ -2,12 +2,18 @@
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings
 
 
 class DatabaseSettings(BaseSettings):
-    path: str = "data/platform.db"
+    # Explicit alias: a bare `path` field would otherwise match the system
+    # PATH environment variable (pydantic-settings matches case-insensitively),
+    # making the sqlite URL `sqlite:///C:\...;D:\...` on every machine.
+    path: str = Field(
+        default="data/platform.db",
+        validation_alias=AliasChoices("DATABASE__PATH", "DB_PATH"),
+    )
     redis_url: str = Field(default="redis://localhost:6379/0", validation_alias="REDIS_URL")
 
 

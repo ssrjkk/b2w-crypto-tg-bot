@@ -79,6 +79,9 @@ SENTRY_DSN=https://xxx@sentry.io/xxx
 ### 3. Run Database Migrations
 
 ```bash
+# tables are also auto-created at startup via create_all, so this step is
+# optional for the sqlite dev flow; for postgres start here:
+alembic revision --autogenerate -m "initial"
 alembic upgrade head
 ```
 
