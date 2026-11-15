@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ssrjkk.github.io/b2w-crypto-tg-bot/sitemap.xml
