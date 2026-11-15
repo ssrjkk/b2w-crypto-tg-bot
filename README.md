@@ -237,34 +237,6 @@ GitHub: https://github.com/ssrjkk
 
 
 
-## Installation
-
-```bash
-git clone https://github.com/ssrjkk/b2w-crypto-tg-bot.git
-cd b2w-crypto-tg-bot
-pip install -r requirements.txt
-```
-
-## Configuration
-
-Create a `.env` file:
-
-```env
-TELEGRAM_BOT_TOKEN=your_bot_token
-DATABASE_URL=postgresql://user:pass@localhost/db
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Or with Docker:
-
-```bash
-docker-compose up -d
-```
 
 ---
 

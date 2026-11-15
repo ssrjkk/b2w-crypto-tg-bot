@@ -520,7 +520,13 @@
         let ws = null;
         let currentQuote = null;
         
-        const API_BASE = 'http://localhost:8000/api';
+        // Same-origin deployment (deploy/nginx.conf): Mini App, API and WS share one host,
+        // so both endpoints follow window.location; opening the file directly in a browser
+        // (file://) falls back to the local uvicorn.
+        const API_ORIGIN = window.location.protocol.startsWith('http')
+            ? window.location.origin
+            : 'http://localhost:8000';
+        const API_BASE = `${API_ORIGIN}/api`;
         
         async function apiCall(endpoint, options = {}) {
             const token = localStorage.getItem('auth_token');
@@ -570,7 +576,7 @@
         }
         
         function connectWebSocket() {
-            const wsUrl = 'ws://localhost:8000/ws';
+            const wsUrl = `${API_ORIGIN.replace(/^http/, 'ws')}/ws`;
             ws = new WebSocket(wsUrl);
             
             ws.onopen = () => {
