@@ -7,6 +7,18 @@ Telegram bot for crypto portfolio tracking and alerts. Monitors prices, sends no
 
 A production-ready Telegram-based crypto trading platform with subscription management, perpetual DEX trading, airdrop tracking, and comprehensive risk management.
 
+**Site:** https://ssrjkk.github.io/b2w-crypto-tg-bot/
+
+## Screenshots
+
+Captured from the published site in a real browser (Chrome, 1440×900 and 390×844).
+
+| Home | Sections |
+| --- | --- |
+| <img src="docs/screenshots/home.jpg" width="420" alt="B2W Crypto — landing page"> | <img src="docs/screenshots/content.jpg" width="420" alt="B2W Crypto — site sections"> |
+
+<p align="center"><img src="docs/screenshots/mobile.jpg" width="320" alt="B2W Crypto — mobile view"></p>
+
 ## Features
 
 - **Telegram Integration**: Bot commands and Mini App interface
