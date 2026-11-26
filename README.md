@@ -1,5 +1,7 @@
 # Telegram Crypto Access & Trading Platform
 
+> **Languages:** [English](README.md) · [Русский](README.ru.md)
+
 Telegram bot for crypto portfolio tracking and alerts. Monitors prices, sends notifications, and provides market analysis.
 
 Telegram crypto portfolio and trading bot with subscriptions, perpetual DEX trading, airdrop tracking and risk controls.
