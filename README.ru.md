@@ -5,7 +5,8 @@
 Telegram-бот и Mini App для отслеживания криптовалютного портфеля, ценовых алертов,
 подписок, торговли на perpetual DEX и учёта airdrop-кампаний.
 
-**Сайт:** https://ssrjkk.github.io/b2w-crypto-tg-bot/
+**Сайт:** https://ssrjkk.github.io/b2w-crypto-tg-bot/  
+**Исходники:** https://github.com/ssrjkk/b2w-crypto-tg-bot
 
 ## Возможности
 
