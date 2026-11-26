@@ -225,4 +225,3 @@ GitHub: https://github.com/ssrjkk
 
 - [API](docs/api_reference.md)
 - [Deploy](docs/deployment.md)
-- [Showcase](https://ssrjkk.github.io/b2w-crypto-tg-bot/showcase/)
