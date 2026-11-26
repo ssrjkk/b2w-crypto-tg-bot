@@ -1,7 +1,4 @@
 # Telegram Crypto Access & Trading Platform
-[![CI](https://github.com/ssrjkk/b2w-crypto-tg-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/b2w-crypto-tg-bot/actions/workflows/ci.yml)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Telegram bot for crypto portfolio tracking and alerts. Monitors prices, sends notifications, and provides market analysis.
 
@@ -217,10 +214,6 @@ ssrjkk — QA Engineer
 Telegram: @ssrjkk
 Email: ray013lefe@gmail.com
 GitHub: https://github.com/ssrjkk
-
-
-
-
 
 ---
 
