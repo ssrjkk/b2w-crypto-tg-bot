@@ -49,7 +49,6 @@ mypy app/
 
 - [API](docs/api_reference.md)
 - [Деплой](docs/deployment.md)
-- [Showcase](https://ssrjkk.github.io/b2w-crypto-tg-bot/showcase/)
 - [Безопасность](SECURITY.md)
 
 ## Лицензия
